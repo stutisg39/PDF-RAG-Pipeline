@@ -10,6 +10,17 @@ from app.db.session import engine
 from app.models import document, conversation
 import os
 
+# Create pgvector extension and database tables
+from sqlalchemy import text
+from pgvector.sqlalchemy import Vector
+
+# Register the Vector type with SQLAlchemy
+VectorType = Vector
+
+with engine.connect() as conn:
+    conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+    conn.commit()
+
 # Create database tables
 document.Base.metadata.create_all(bind=engine)
 conversation.Base.metadata.create_all(bind=engine)
@@ -22,10 +33,11 @@ app = FastAPI(
 
 # CORS middleware
 app.add_middleware(
-    CORSMiddleware,
+   CORSMiddleware,
     allow_origins=["http://localhost:3000"],
+    #allow_origin_regex=r"https?://.*\.app\.github\.dev",
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 

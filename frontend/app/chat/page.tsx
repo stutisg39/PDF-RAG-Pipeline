@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
+import { api } from "../../lib/api";
 
 interface Message {
   id: number;
@@ -47,7 +48,7 @@ export default function ChatPage() {
     setMessages(prev => [...prev, tempUserMessage]);
 
     try {
-      const response = await fetch('http://localhost:8000/api/chat', {
+      const response = await fetch(api.endpoints.chat, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -136,7 +137,7 @@ export default function ChatPage() {
                                 {source.caption || 'Image'}
                               </p>
                               <img
-                                src={`http://localhost:8000${source.url}`}
+                                src={`${api.baseUrl}/${source.url}`}
                                 alt={source.caption || 'Document image'}
                                 className="max-w-full rounded"
                               />
@@ -149,7 +150,7 @@ export default function ChatPage() {
                                 {source.caption || 'Table'}
                               </p>
                               <img
-                                src={`http://localhost:8000${source.url}`}
+                                src={`${api.baseUrl}/${source.url}`}
                                 alt={source.caption || 'Document table'}
                                 className="max-w-full rounded"
                               />

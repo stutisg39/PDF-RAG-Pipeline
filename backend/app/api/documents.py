@@ -11,6 +11,7 @@ from app.core.config import settings
 import os
 import uuid
 from datetime import datetime
+import asyncio
 
 router = APIRouter()
 
@@ -47,6 +48,7 @@ async def upload_document(
     # Save file
     with open(file_path, "wb") as f:
         f.write(contents)
+    print("File saved successfully")
     
     # Create document record
     document = Document(
@@ -59,15 +61,28 @@ async def upload_document(
     db.refresh(document)
     
     # TODO: Trigger background processing
-    # background_tasks.add_task(process_document_task, document.id, file_path, db)
-    # For now, you can process synchronously or implement Celery
-    
+    background_tasks.add_task(process_document_task, document.id, file_path, db)
     return {
         "id": document.id,
-        "filename": document.filename,
-        "status": document.processing_status,
-        "message": "Document uploaded successfully. Processing will begin shortly."
+        "message": "Document uploaded successfully and queued for processing"
     }
+    
+
+def process_document_task(document_id: int, file_path: str, db: Session):
+    """
+    Background task to process document using DocumentProcessor
+    """
+    processor = DocumentProcessor(db)
+    try:
+        print("Starting document processing in background task...")
+        asyncio.run(processor.process_document(file_path, document_id))
+    except Exception as e:
+        document = db.query(Document).filter(Document.id == document_id).first()
+        if document:
+            document.processing_status = "failed"
+            document.error_message = str(e)
+            db.commit()
+    # Background task completed - no return value needed
 
 
 @router.get("")

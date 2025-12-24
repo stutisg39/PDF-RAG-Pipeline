@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { api } from "../lib/api";
 
 interface Document {
   id: number;
@@ -24,7 +25,7 @@ export default function Home() {
 
   const fetchDocuments = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/documents");
+      const response = await fetch(api.endpoints.documents);
       const data = await response.json();
       setDocuments(data.documents || []);
     } catch (error) {
@@ -38,7 +39,7 @@ export default function Home() {
     if (!confirm("Are you sure you want to delete this document?")) return;
     
     try {
-      await fetch(`http://localhost:8000/api/documents/${id}`, {
+      await fetch(`${api.endpoints.documents}/${id}`, {
         method: "DELETE",
       });
       fetchDocuments();

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { api } from "../../../lib/api";
 
 interface DocumentDetail {
   id: number;
@@ -43,7 +44,7 @@ export default function DocumentDetailPage() {
 
   const fetchDocument = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/documents/${params.id}`);
+      const response = await fetch(`${api.endpoints.documents}/${params.id}`);
       const data = await response.json();
       setDocument(data);
     } catch (error) {
@@ -149,7 +150,7 @@ export default function DocumentDetailPage() {
             {document.images.map((image) => (
               <div key={image.id} className="border rounded-lg p-4">
                 <img
-                  src={`http://localhost:8000${image.url}`}
+                  src={`${api.baseUrl}${image.url}`}
                   alt={image.caption || 'Document image'}
                   className="w-full rounded mb-2"
                 />
@@ -175,7 +176,7 @@ export default function DocumentDetailPage() {
             {document.tables.map((table) => (
               <div key={table.id} className="border rounded-lg p-4">
                 <img
-                  src={`http://localhost:8000${table.url}`}
+                  src={`${api.baseUrl}${table.url}`}
                   alt={table.caption || 'Document table'}
                   className="w-full rounded mb-2"
                 />
