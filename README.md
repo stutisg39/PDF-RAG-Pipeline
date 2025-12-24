@@ -4,12 +4,20 @@
 
 Build a system that allows users to upload PDF documents, extract text, images, and tables, and engage in multimodal chat based on the extracted content.
 
-### Core Features
+### Core Features Implemented
 1. **Document Processing**: PDF parsing using Docling (extract text, images, tables)
 2. **Vector Store**: Store extracted content in vector database
 3. **Multimodal Chat**: Provide answers with related images/tables for text questions
 4. **Multi-turn Conversation**: Maintain conversation context for continuous questioning
 
+### Limitations
+1. Agent currently uses free version of OPENAI model which supports only text based searches. 
+
+### Future Improvements
+1. Use any other multimodal like Gemini model for searches 
+2. Show tables in a better way
+3. Currently showing images and tables based on document id and page number in chunk ids. For future need to improve this  and make it more contextual
+4. The model currently supports top 5 chunks. For future need to include searches/ answers based on full docuement context. Example summarize the document.
 ---
 
 ## Provided Components (Starting Point)
@@ -269,7 +277,7 @@ class DocumentChunk:
     id: int
     document_id: int
     content: str
-    embedding: Vector(1536)  # pgvector
+    embedding: Vector(384)  # pgvector
     page_number: int
     chunk_index: int
     metadata: JSON  # {related_images: [...], related_tables: [...]}
@@ -439,10 +447,21 @@ docker-compose up -d
 - Future improvements
 - Screenshots (minimum 5):
   - Document upload screen
+  ![alt text](image.png)
   - Document processing completion screen
+  ![alt text](image-1.png)
+  ![alt text](image-2.png)
   - Chat interface
+  ![alt text](image-3.png)
   - Answer example with images
+  ![alt text](image-4.png)
+  ![alt text](image-5.png)
   - Answer example with tables
+  ![alt text](image-6.png)
+  ![alt text](image-7.png)
+  -Multi turn conversation
+  ![alt text](image-8.png)
+  ![alt text](image-9.png)
 
 ### How to Submit
 1. Push code to GitHub
