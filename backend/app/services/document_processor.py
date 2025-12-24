@@ -326,11 +326,13 @@ class DocumentProcessor:
         #embeddings = self.model.encode(texts, convert_to_numpy=True)
         db_chunks = []
         for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
+            page_number = chunk["metadata"]["page_numbers"][0] if chunk["metadata"].get("page_numbers") else None
+            #print("Page number for chunks:", page_number, type(page_number))
             db_chunk = DocumentChunk(
                 document_id=document_id,
                 content=chunk["content"],
                 embedding=embedding.tolist(),  # pgvector / JSON compatible
-                page_number=chunk.get("metadata", {}).get("page_number"),
+                page_number= page_number,
                 chunk_index=i,
                 chunk_metadata={
                     **chunk.get("metadata", {})
@@ -366,8 +368,8 @@ class DocumentProcessor:
             file_path=metadata.get("file_path", ""),
             page_number=page_number,
             caption=metadata.get("caption", ""),
-            width=metadata.get("width"),
-            height=metadata.get("height"),
+            width=int(metadata.get("width")),
+            height=int(metadata.get("height")),
             image_metadata=metadata,
             created_at=datetime.now()
         )
