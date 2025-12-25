@@ -1,4 +1,4 @@
-# Multimodal Document Chat System - Coding Test
+# Multimodal Document Chat System 
 
 ## Project Overview
 
@@ -19,10 +19,6 @@ Build a system that allows users to upload PDF documents, extract text, images, 
 3. Currently showing images and tables based on document id and page number in chunk ids. For future need to improve this  and make it more contextual
 4. The model currently supports top 5 chunks. For future need to include searches/ answers based on full docuement context. Example summarize the document.
 ---
-
-## Provided Components (Starting Point)
-
-The following items are **already implemented and provided**:
 
 ### Infrastructure Setup
 - Docker Compose configuration (PostgreSQL+pgvector, Redis, Backend, Frontend)
@@ -60,162 +56,10 @@ The following items are **already implemented and provided**:
 
 ---
 
-## Core Features to Implement (Your Job)
-
-You need to implement the following **3 core features**:
-
 ### 1. Document Processing Pipeline (Critical)
 
 **Location**: `backend/app/services/document_processor.py`
 
-**Requirements**:
-```python
-class DocumentProcessor:
-    async def process_document(self, file_path: str, document_id: int) -> Dict[str, Any]:
-        """
-        Process a PDF document to extract text, images, and tables.
-        
-        Implementation steps:
-        1. Parse PDF using Docling
-        2. Extract and chunk text (for vector storage)
-        3. Extract and save images (filesystem + DB)
-        4. Extract and save tables (structured data + image)
-        5. Error handling and status updates
-        
-        Returns:
-            {
-                "status": "success",
-                "text_chunks": 50,
-                "images": 10,
-                "tables": 5,
-                "processing_time": 12.5
-            }
-        """
-        pass
-```
-
-**Evaluation Criteria**:
-- Docling integration and PDF parsing accuracy
-- Image extraction and storage (filename, path, metadata)
-- Table extraction (preserve structure, render as image)
-- Text chunking strategy (chunk size, overlap)
-- Error handling (invalid PDF, memory overflow, etc.)
-
----
-
-### 2. Vector Store Integration (Critical)
-
-**Location**: `backend/app/services/vector_store.py`
-
-**Requirements**:
-```python
-class VectorStore:
-    async def store_text_chunks(
-        self, 
-        chunks: List[Dict[str, Any]], 
-        document_id: int
-    ) -> int:
-        """
-        Store text chunks with vector embeddings.
-        
-        Implementation steps:
-        1. Generate embeddings using OpenAI/HuggingFace
-        2. Store in pgvector (vector + metadata)
-        3. Include image/table references in metadata
-        
-        Returns:
-            Number of stored chunks
-        """
-        pass
-    
-    async def search_similar(
-        self, 
-        query: str, 
-        document_id: Optional[int] = None,
-        k: int = 5
-    ) -> List[Dict[str, Any]]:
-        """
-        Search for chunks similar to the query.
-        
-        Returns:
-            [
-                {
-                    "content": "...",
-                    "score": 0.95,
-                    "metadata": {...},
-                    "related_images": [...],
-                    "related_tables": [...]
-                }
-            ]
-        """
-        pass
-```
-
-**Evaluation Criteria**:
-- Embedding model selection and integration
-- pgvector utilization (cosine similarity, indexing)
-- Metadata management (image/table references)
-- Search accuracy and performance
-
----
-
-### 3. Multimodal Chat Engine (Critical)
-
-**Location**: `backend/app/services/chat_engine.py`
-
-**Requirements**:
-```python
-class ChatEngine:
-    async def process_message(
-        self,
-        conversation_id: int,
-        message: str,
-        document_id: Optional[int] = None
-    ) -> Dict[str, Any]:
-        """
-        Process user message and generate multimodal response.
-        
-        Implementation steps:
-        1. Load conversation history (multi-turn support)
-        2. Find relevant context using vector search
-        3. Find related images/tables
-        4. Generate answer using LLM
-        5. Include image/table URLs in response
-        
-        Returns:
-            {
-                "answer": "...",
-                "sources": [
-                    {
-                        "type": "text",
-                        "content": "...",
-                        "score": 0.95
-                    },
-                    {
-                        "type": "image",
-                        "url": "/uploads/images/abc123.png",
-                        "caption": "Figure 1: ..."
-                    },
-                    {
-                        "type": "table",
-                        "url": "/uploads/tables/xyz789.png",
-                        "caption": "Table 1: ..."
-                    }
-                ],
-                "processing_time": 2.5
-            }
-        """
-        pass
-```
-
-**Evaluation Criteria**:
-- RAG implementation quality (relevance, accuracy)
-- Multi-turn conversation support (context maintenance)
-- Include images/tables in responses
-- LLM prompt engineering
-- Response speed and user experience
-
----
 
 ## System Architecture
 
@@ -378,75 +222,18 @@ docker-compose up -d
 ```
 
 ---
+### Limitations
+1. Agent currently uses free version of OPENAI model which supports only text based searches. 
 
-## Evaluation Criteria (100 points)
+### Future Improvements
+1. Use any other multimodal like Gemini model for searches 
+2. Show tables in a better way
+3. Currently showing images and tables based on document id and page number in chunk ids. For future need to improve this  and make it more contextual
+4. The model currently supports top 5 chunks. For future need to include searches/ answers based on full docuement context. Example summarize the document.
 
-### 1. Code Quality (25 points)
-- **Structure** (10 points): Module separation, responsibility separation, reusability
-- **Readability** (8 points): Naming, comments, code style
-- **Error Handling** (7 points): Exception handling, error messages, recovery strategy
-
-### 2. Feature Implementation (40 points)
-- **Document Processing** (15 points):
-  - Docling integration and PDF parsing (5 points)
-  - Image extraction and storage (5 points)
-  - Table extraction and storage (5 points)
-
-- **Vector Store** (10 points):
-  - Embedding generation and storage (5 points)
-  - Similarity search accuracy (5 points)
-
-- **Chat Engine** (15 points):
-  - RAG implementation quality (5 points)
-  - Multimodal responses (images/tables included) (5 points)
-  - Multi-turn conversation support (5 points)
-
-### 3. UX/UI (15 points)
-- **Chat Interface** (8 points): Intuitiveness, responsiveness, image/table display
-- **Document Upload/Management** (4 points): Progress indication, error display
-- **Design** (3 points): Consistency, aesthetics
-
-### 4. Documentation (10 points)
-- **README** (4 points): Installation, execution, feature explanation
-- **Code Comments** (3 points): Complex logic explanation
-- **API Documentation** (3 points): Swagger or separate documentation
-
-### 5. Testing (10 points)
-- **Unit Tests** (5 points): Core logic testing
-- **Integration Tests** (3 points): API endpoint testing
-- **Test Coverage** (2 points): 60% or higher
-
----
-
-## Bonus Points (+20 points)
-
-- **Advanced PDF Processing** (+5 points): OCR, complex layout handling
-- **Multi-document Search** (+5 points): Search across multiple documents
-- **Real-time Chat** (+5 points): WebSocket-based
-- **Deployment** (+5 points): Production deployment setup (Railway, Vercel, etc.)
-
----
-
-## Submission Requirements
-
-### What to Submit
-1. **GitHub Repository** (public or private with access)
-2. **Complete source code** (backend + frontend)
-3. **Docker configuration** (docker-compose.yml)
-4. **Documentation** (README, API docs, architecture)
-5. **Sample data** (at least one test PDF)
-
-### README Must Include
-- Project overview
-- Tech stack
-- Setup instructions (Docker)
-- Environment variables (.env.example)
-- API testing examples
-- Features implemented
-- Known limitations
-- Future improvements
-- Screenshots (minimum 5):
+### Screenshots :
   - Document upload screen
+
   ![alt text](image.png)
   - Document processing completion screen
   ![alt text](image-1.png)
@@ -463,39 +250,6 @@ docker-compose up -d
   ![alt text](image-8.png)
   ![alt text](image-9.png)
 
-### How to Submit
-1. Push code to GitHub
-2. Test that `docker-compose up` works
-3. Send repository URL via email
-4. Include any special instructions
-
----
-
-## Test Scenarios
-
-### Scenario 1: Basic Document Processing
-1. Upload a technical paper PDF
-2. Verify text, images, and tables extraction
-3. Check extracted content on document detail page
-
-### Scenario 2: Text-based Question
-1. Ask "What is the main conclusion of this paper?"
-2. Verify answer is generated with relevant text context
-
-### Scenario 3: Image-related Question
-1. Ask "Show me the architecture diagram"
-2. Verify related images are displayed in chat
-
-### Scenario 4: Table-related Question
-1. Ask "What are the experimental results?"
-2. Verify related tables are displayed in chat
-
-### Scenario 5: Multi-turn Conversation
-1. First question: "What is the dataset used?"
-2. Follow-up: "How many samples does it contain?"
-3. Verify previous conversation context is maintained
-
----
 
 ## Sample PDF
 
@@ -511,146 +265,7 @@ You should use this PDF to test your implementation.
 
 ---
 
-## Implementation Guidelines
 
-Refer to the service skeleton files for detailed implementation guidance:
-- `backend/app/services/document_processor.py` - Document processing guidelines
-- `backend/app/services/vector_store.py` - Vector store implementation tips
-- `backend/app/services/chat_engine.py` - Chat engine implementation tips
-
-Each file contains detailed TODO comments with implementation hints and examples.
-
----
-
-## Troubleshooting
-
-### Document Processing Issues
-**Problem**: Docling can't extract tables
-**Solution**: 
-- Check PDF format (ensure it's not scanned image)
-- Add fallback parsing logic
-- Manually define table structure patterns
-
-### LLM API Costs
-**Problem**: OpenAI API is expensive
-**Solution**: Use free alternatives
-- Use caching for repeated queries
-- Use cheaper models (gpt-3.5-turbo)
-- Use local LLM (Ollama) for development
-
-### Vector Search Issues
-**Problem**: Search results are not relevant
-**Solution**:
-- Verify embedding model is working
-- Check chunk size and overlap settings
-- Ensure pgvector extension is installed
-- Test with simple queries first
-
-### CORS Issues
-**Problem**: Frontend can't call backend API
-**Solution**:
-- Add CORS middleware in FastAPI
-- Allow origin: http://localhost:3000
-- Check network configuration in Docker
-
----
-
-## Free LLM Options
-
-You don't need to pay for OpenAI API! Here are free alternatives:
-
-### Option 1: Ollama (Recommended for Development)
-
-**Completely free, runs locally on your machine**
-
-1. **Install Ollama**
-```bash
-# Mac
-brew install ollama
-
-# Linux
-curl -fsSL https://ollama.com/install.sh | sh
-
-# Windows
-# Download from https://ollama.com/download
-```
-
-2. **Download a model**
-```bash
-# Llama 3.2 (3B - fast, good for development)
-ollama pull llama3.2
-
-# Or Llama 3.1 (8B - better quality)
-ollama pull llama3.1
-
-# Or Mistral (7B - good balance)
-ollama pull mistral
-```
-
-3. **Update your .env**
-```bash
-# Use Ollama instead of OpenAI
-LLM_PROVIDER=ollama
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=llama3.2
-```
-
-**Pros**: Free, private, no API limits, works offline
-**Cons**: Requires decent hardware (8GB+ RAM), slower than cloud APIs
-
----
-
-### Option 2: Google Gemini (Free Tier)
-
-**Free tier: 60 requests per minute**
-
-1. **Get free API key**
-   - Go to https://makersuite.google.com/app/apikey
-   - Click "Create API Key"
-   - Copy your key
-
-2. **Update .env**
-```bash
-GOOGLE_API_KEY=your-gemini-api-key
-LLM_PROVIDER=gemini
-```
-
-**Pros**: Free, fast, good quality
-**Cons**: Rate limits, requires internet
-
----
-
-### Option 3: Groq (Free Tier)
-
-**Free tier: Very fast inference, generous limits**
-
-1. **Get free API key**
-   - Go to https://console.groq.com
-   - Sign up and get API key
-
-2. **Update .env**
-```bash
-GROQ_API_KEY=your-groq-api-key
-LLM_PROVIDER=groq
-```
-
-**Pros**: Free, extremely fast, good quality
-**Cons**: Rate limits, requires internet
-
----
-
-### Comparison Table
-
-| Provider | Cost | Speed | Quality | Setup |
-|----------|------|-------|---------|-------|
-| **Ollama** | Free | Medium | Good | Easy |
-| **Gemini** | Free | Fast | Very Good | Very Easy |
-| **Groq** | Free | Very Fast | Good | Very Easy |
-| OpenAI | Paid | Fast | Excellent | Very Easy |
-
-**Recommended**: Use **Ollama** for development (free, no limits)
-
----
 
 ## FAQ
 
@@ -669,13 +284,6 @@ A: Render tables as images or display JSON data as HTML tables in frontend.
 **Q: How do I test the system locally?**
 A: Follow the Getting Started section and use the provided sample PDF (1706.03762v7.pdf).
 
----
-
-## Questions?
-
-If you have any questions, please create an issue or contact us via email.
-
-Good luck!
 
 ---
 
